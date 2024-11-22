@@ -6,6 +6,7 @@
     "@babel/preset-typescript": "^7.16.7",
     "@material-ui/core": "^4.8.2",
     "@material-ui/icons": "^4.5.1",
+    "@material-ui/lab": "^4.0.0-alpha.60",
     "@rails/actioncable": "^6.0.0-alpha",
     "@rails/activestorage": "^6.0.0-alpha",
     "@rails/ujs": "^6.0.0-alpha",

@@ -31,6 +31,7 @@ import { updateChannels, useSelectorChannels } from '../modules/channelsModule'
 import { useDispatch } from 'react-redux'
 import { useSelectorUser } from '../modules/userModule'
 import LoginDialog from './LoginDialog'
+import Alert from '@material-ui/lab/Alert'
 
 type Props = {
   channel: Channel
@@ -56,6 +57,7 @@ const Video = (props: Props) => {
   const [visibleControll, setVisibleControll] = useState<boolean>(false)
   const [readyState, setReadyState] = useState<number>(0)
   const [loginDialogOpen, setLoginDialogOpen] = useState(false)
+  const [audioBlocked, setAudioBlocked] = useState<boolean>(false)
 
   const videoElementId = `videoElement-${channel.streamId}`
   const isHlsPlay = isHls && channel.streamId.length
@@ -110,7 +112,16 @@ const Video = (props: Props) => {
 
       flvPlayer.attachMediaElement(videoElement)
       flvPlayer.load()
-      flvPlayer.play()
+      ;(flvPlayer.play() as Promise<void>).catch((error) => {
+        console.error(error)
+        if (error instanceof DOMException) {
+          setAudioBlocked(true)
+          // ミュート再生を試みる
+          flvPlayer.muted = true
+          setMuted(flvPlayer.muted)
+          flvPlayer.play()
+        }
+      })
 
       // 再生ステートを初期化
       setReadyState(0)
@@ -181,6 +192,8 @@ const Video = (props: Props) => {
           )
         )}
       </Progress>
+
+      <Alert style={{visibility: (audioBlocked && muted) ? 'visible' : 'hidden', position: 'absolute', width: width - 20, left: 10, top: 10 }} severity="info" onClick={() => { setAudioBlocked(false); setMuted(player.muted = false) }}>ここをタップしてミュートを解除</Alert>
 
       {(visibleControll || isIOS) && (
         <VideoControl
@@ -277,6 +290,7 @@ const Video = (props: Props) => {
                     onClick={() => {
                       player.muted = false
                       setMuted(player.muted)
+                      setAudioBlocked(false)
                     }}
                   >
                     <VolumeOffIcon style={{ color: 'white' }} />
