@@ -91,7 +91,7 @@ const App = () => {
   }
 
   return (
-    <BrowserRouter>
+    <BrowserRouter forceRefresh={true}>
       <PageViewTracker>
         <div className={classes.root}>
           <CssBaseline />
